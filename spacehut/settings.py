@@ -21,12 +21,13 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 't3hm4h%)a!rp+k98t(5dso85-8=!)=rz15mi_@a)8@1$2u^7-w'
+# SECRET_KEY = 't3hm4h%)a!rp+k98t(5dso85-8=!)=rz15mi_@a)8@1$2u^7-w'
+SECRET_KEY = os.environ.get('SPACEHUT_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['spacehut.herokuapp.com']
 
 
 # Application definition
