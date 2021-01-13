@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 SECRET_KEY = os.environ.get('SPACEHUT_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (os.environ.get('SPACEHUT_DEBUG_VALUE') == 'True')
 
 ALLOWED_HOSTS = ['spacehut.herokuapp.com']
 
