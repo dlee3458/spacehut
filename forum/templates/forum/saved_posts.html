@@ -1,0 +1,40 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+    <div class="ajaxify">
+        <div class="ajaxify_saved_count">
+            <h3 class="mb-3">Saved posts({{ saved_posts.count }})</h3>
+        </div>
+        {% for post in saved_posts %}
+            <article class="media content-section">
+                <img class="rounded-circle article-img" id="user-pic-{{ post.author.username }}" src="{{ post.author.profile.image.url }}">
+                    <div class="media-body">
+                        <div class="article-metadata" id="article-metadata">
+                            {% if post.author == request.user %}
+                                <a class="logged-in mr-2" id="personal-profile" href="{% url 'profile' %}">{{ post.author }}</a>
+                            {% else %}
+                                <a class="different-user mr-2" id="user-profile" value="{{ post.author.username }}" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
+                            {% endif %}
+                            <small class="text-muted">{{ post.date_posted|date:'F d' }}</small>
+                            <a href="{% url 'community-detail-new' post.community.name %}" class="community-detail-new"><small class="text-muted" style="float: right; margin-left: 4px;">{{ post.community }}</small><img src="{{ post.community.thumbnail.url }}" width="20" height="20" style="float: right;"></a>
+                        </div>
+                        <h2><a class="article-title" id="post-details" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                        <p class="article-content">{{ post.content }}</p>
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="" class="img-fluid">
+                        {% endif %}
+                        <div class="total-comments-likes{{ post.id }}" style="margin-top: 8px;">
+                        {% include 'forum/like_section.html' %}
+                        </div>
+                    </div>
+            </article>
+        {% endfor %}
+    </div>
+
+{% endblock content %}
+
+{% block sidecontent %}
+    <div class="right-side">
+        {% include 'forum/main_community_list.html' %}
+    </div>
+{% endblock sidecontent %}

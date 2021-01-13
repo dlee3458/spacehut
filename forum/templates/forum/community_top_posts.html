@@ -1,0 +1,70 @@
+{% extends "forum/base.html" %}
+
+{% block topcontent %}
+    <div class="community-header">
+        <div class="stars" style="height: 210px; box-shadow: 0px 8px 8px #b6b6b6;"></div>
+        <div class="twinkling" style="height: 210px;"></div>
+    </div>
+{% endblock topcontent %}
+{% block content %}
+    <div class="ajaxify">
+        <img src="{{ community.thumbnail.url }}" width="60" height="60" style="margin-bottom: 20px;">
+        <h1 style="display: inline-block; color: white;">{{ community.name }}</h1>
+        <div class="about-community-mobile">
+            {% include 'forum/about_community.html' %}
+        </div>
+        {% if request.user.is_authenticated %}
+            <div class="create-post" style="margin-top: 22px;">
+                <img class="rounded-circle" src="{{ user.profile.image.url }}" width="40" height="40">
+                <a class="community-create-post" href="{% url 'community-post' community.name %}"><input type="text" placeholder="Create Post"></a>
+            </div>
+        {% else %}
+            <div style="margin-top: 22px;"></div>
+        {% endif %}
+        <div class="category">
+            <a href="{% url 'community-detail-new' community.name %}" id="community-new"><button class="community-new-button"><img src="/media/new.svg" width="20" height="20" style="margin-bottom: 3px; margin-right: 2px;">New</button></a>
+            <a href="{% url 'community-detail-trending' community.name %}" id="community-trending"><button class="community-trending-button"><img src="/media/trending.svg" width="20" height="20" style="margin-bottom: 3px;">Trending</button></a>
+            <button class="community-top-button-selected"><img src="/media/self-growth.svg" width="20" height="20" style="margin-right: 2px;">Top</button>
+        </div>
+        <div class="infinite-container">
+            {% for post in posts %}
+                <div class="infinite-item">
+                    <article class="media content-section">
+                        <img class="rounded-circle article-img" id="user-pic-{{ post.author.username }}" src="{{ post.author.profile.image.url }}">
+                            <div class="media-body">
+                                <div class="article-metadata" id="article-metadata">
+                                    {% if post.author == request.user %}
+                                        <a class="logged-in mr-2" id="personal-profile" href="{% url 'profile' %}">{{ post.author }}</a>
+                                    {% else %}
+                                        <a class="different-user mr-2" id="user-profile" href="{% url 'user-posts' post.author.username %}" value="{{ post.author.username }}">{{ post.author }}</a>
+                                    {% endif %}
+                                    <small class="text-muted">{{ post.date_posted|date:'F d' }}</small>
+                                </div>
+                                <h2><a class="article-title" id="post-details" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                                <p class="article-content">{{ post.content|urlize }}</p>
+                                {% if post.image %}
+                                    <img src="{{ post.image.url }}" alt="" class="img-fluid">
+                                {% else %}
+                                {% endif %}
+                                <div class="total-comments-likes{{ post.id }}" name="{{ post.id }}" style="margin-top: 8px;">
+                                    {% include 'forum/messages.html' %}
+                                    {% include 'forum/like_section.html' %}
+                                </div>
+                            </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if posts.has_next %}
+            <a class="infinite-more-link" href="?page={{ posts.next_page_number }}"></a>
+        {% endif %}
+    </div>
+{% endblock content %}
+
+{% block sidecontent %}
+    <div class="right-side">
+        {% include 'forum/about_community.html' %}
+        {% include 'forum/main_community_list.html' %}
+    </div>
+{% endblock sidecontent %}

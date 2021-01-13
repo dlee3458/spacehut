@@ -1,0 +1,27 @@
+{% if request.user.is_authenticated %}
+    <form action="{% url 'like_comment' %}" method="post">
+        {% csrf_token %}
+        {% if user in comment.likes.all %}
+            <button type="submit" id='like-comment' name="comment_id" value="{{ comment.id }}" class="comment-like-button{{ comment.id }}"><img class="like-img{{ post.id }}" src="/media/upload.svg" width="20" height="20"></button>
+            <span style="color: rgb(64, 128, 211);">{{ comment.likes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='like-comment' name="comment_id" value="{{ comment.id }}" class="comment-like-button{{ comment.id }}"><img class="like-img{{ post.id }}" src="/media/up-arrow.svg" width="20" height="20"></button>
+            {{ comment.likes.all.count }}
+        {% endif %}
+    </form>
+    <form action="{% url 'dislike_comment' %}" method="post">
+        {% csrf_token %}
+        {% if user in comment.dislikes.all %}
+            <button type="submit" id='dislike-comment' name="comment_id" value="{{ comment.id }}" class="comment-dislike-button{{ comment.id }}"><img class="dislike-img{{ post.id }}" src="/media/upload (1).svg" width="20" height="20"></button>
+            <span style="color: rgb(241, 65, 65);">{{ comment.dislikes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='dislike-comment' name="comment_id" value="{{ comment.id }}" class="comment-dislike-button{{ comment.id }}"><img class="dislike-img{{ post.id }}" src="/media/up-arrow (1).svg" width="20" height="20"></button>
+            {{ comment.dislikes.all.count }}
+        {% endif %}
+    </form>
+{% else %}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow.svg" width="20" height="20" style="margin-bottom: 2px;" disabled></a>
+        {{ comment.likes.count }}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow (1).svg" width="20" height="20" style="margin-bottom: 2px; margin-left: 4px;" disabled></a>
+        {{ comment.dislikes.all.count }}
+{% endif %}

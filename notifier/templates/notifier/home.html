@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifier</title>
+    <script src="{% static '/js/websocketbridge.js' %}" type="text/javascript"></script>
+</head>
+<body>
+    <h1>Notifier</h1>
+    <p>Notifications</p>
+    <ul id="notifylist"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const webSocketBridge = new channels.WebSocketBridge();
+            const nl = document.querySelector('#notifylist');
+
+            webSocketBridge.connect('/notifications/');
+            webSocketBridge.listen(function(action, stream) {
+                console.log("RESPONSE:", action);
+
+                if(action.event = "New comment") {
+                    var el = document.createElement("li");
+                    var post = action.post
+                    var notification_count = action.notification_count
+                    el.innerHTML = 'New comment at ' + post + notification_count;
+                    nl.appendChild(el);
+                }
+            })
+            document.ws = webSocketBridge; /* for debugging */
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+body{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.main {
+    display: flex;
+}
+
+.chat-rooms {
+    height: 100vh;
+    overflow: hidden;
+    width: 30vw;
+    background: rgb(180, 179, 179);
+    color: black;
+    overflow-y: auto;
+}
+
+.chat-room {
+    background: rgb(180, 179, 179);
+    padding: 15px 10px;
+    padding-right: 15px;
+    padding-bottom: 0;
+}
+
+.chat-room-line {
+    border-color: rgb(133, 131, 131);
+    margin-left: -10px; 
+    margin-right: -20px;   
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.chat-notification-badge {
+    position: relative;
+    left: 34px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 14px;
+}
+
+@keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-webkit-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-moz-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-ms-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+
+.stars, .twinkling {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+.stars {
+    background:#000 url(http://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
+    z-index:-1;
+}
+  
+.twinkling {
+    background:transparent url(http://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+    z-index: -1;
+
+    -moz-animation:move-twink-back 200s linear infinite;
+    -ms-animation:move-twink-back 200s linear infinite;
+    -o-animation:move-twink-back 200s linear infinite;
+    -webkit-animation:move-twink-back 200s linear infinite;
+    animation:move-twink-back 200s linear infinite;
+}
+
+.chat-area {
+    /* padding: 10px 20px; */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-box {
+    flex: 1;
+    width: 70vw;
+    display: inline-block;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.send-chat {
+    width: 100%;
+}
+
+
+#chat-message-input {
+    border-right: none !important;
+    border: 1px solid rgb(183, 183, 184);
+}
+
+.chat-message-submit {
+    border-left: none;
+    background: white;
+    outline: none;
+    border: 1px solid rgb(183, 183, 184);
+}
+
+.other-user-message-box {
+    margin-bottom: 30px;
+    clear: both;
+    margin-left: 20px;
+    width: 45%;
+}
+
+.current-user-message-box {
+    margin-bottom: 30px;
+    position: relative;
+    clear: both;
+    float: right;
+    margin-right: 20px;
+    width: 45%;
+}
+
+.current-user-message-box::after {
+    width: 100%;
+}
+
+.current-user-message {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: cornflowerblue;
+    color: white;
+    clear: left;
+    margin-bottom: 8px;
+    float: right;
+
+}
+
+.current-user-message::before {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    right: -10px;
+    border: 10px solid transparent;
+    border-bottom: 10px solid cornflowerblue;
+}
+  
+.current-user-message::after {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    right: -8px;
+    border: 10px solid transparent;
+    border-bottom: 10px solid cornflowerblue;
+    clear: both;
+}
+  
+
+.other-user-message {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: white;
+    color: black;
+    display: inline-block;
+    clear: both;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.other-user-message::before {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    left: -10px;
+    border: 10px solid transparent;
+    border-bottom: 10px solid white;
+}
+  
+.other-user-message::after {
+content: '';
+position: absolute;
+visibility: visible;
+top: 0px;
+left: -8px;
+border: 10px solid transparent;
+border-bottom: 10px solid white;
+clear: both;
+}
+  
+
+.chat-user-img {
+    width: 5vh;
+    height: 5vh;
+    float: left;
+}
+
+.other-user-message-date {
+    color: white;
+    font-size: 12px;
+}
+
+.date-box {
+    float: right;
+    clear: both;
+}
+
+.current-user-message-date {
+    color: white;
+    font-size: 12px;
+}
+
+.new-message-details {
+    margin-left: 7vh;
+}
+
+@media only screen and (max-width: 980px) {
+    .chat-room p {
+        font-size: 14px;
+    }
+    .chat-room img {
+        width: 25px;
+        height: 25px;
+    }
+    .media-body {
+        margin-left: -12px;
+    }
+    .chat-notification-badge {
+        margin-left: 2px;
+        padding: 3px 6px;
+        font-size: 12px;
+    }
+    .chat-rooms {
+        width: 40vw !important;
+    }
+    .chat-box {
+        width: 60vw;
+    }
+    .current-user-message-date {
+        font-size: 10px;
+    }
+    .current-user-message {
+        font-size: 14px;
+    }
+    .other-user-message-date {
+        font-size: 10px;
+    }
+    .other-user-message {
+        font-size: 14px;
+    }
+}
+
+.chat-rooms::-webkit-scrollbar {
+    width: 10px;
+    position: absolute;
+    right: 0;
+}
+  
+/* Track */
+.chat-rooms::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 10px;
+}
+
+/* Handle */
+.chat-rooms::-webkit-scrollbar-thumb {
+    background: cadetblue; 
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.chat-rooms::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+

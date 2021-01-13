@@ -1,0 +1,331 @@
+html, body {
+    margin-top: 5rem;
+}
+
+body {
+    color: black;
+    font-family: 'Roboto Mono', monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: black;
+}
+
+ul {
+    margin: 0;
+}
+
+@keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-webkit-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-moz-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-ms-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+
+.stars, .twinkling, .clouds {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+.stars {
+    background:#000 url(http://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
+    z-index:-1;
+}
+  
+.twinkling {
+    background:transparent url(http://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+    z-index: -1;
+
+    -moz-animation:move-twink-back 200s linear infinite;
+    -ms-animation:move-twink-back 200s linear infinite;
+    -o-animation:move-twink-back 200s linear infinite;
+    -webkit-animation:move-twink-back 200s linear infinite;
+    animation:move-twink-back 200s linear infinite;
+}
+
+.bg-steel {
+    background-color: black;
+    box-shadow: 0px 8px 8px #b6b6b6;
+}
+
+#alert {
+    position: fixed;
+    width: 50vw;
+    bottom: 10px;
+    z-index: 1;
+    border: 3px solid green;
+    border-radius: 10px;
+}
+
+#alert button {
+    outline: none !important;
+}
+
+.content-section {
+    background: #ffffff;
+    padding: 10px 20px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.side-content {
+    background: black;
+    border-radius: 10px 10px 0px 0px;
+    padding-top: 50px;
+    text-align: center;
+}
+
+.community-ol {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    color: black;
+    text-align: left;
+    margin-bottom: 0;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+    padding-bottom: 8px;
+}
+
+.community-ol hr:last-child {
+    display: none;
+}
+
+.community-ol li {
+    margin-top: 8px;
+    counter-increment: custom;
+    padding-left: 12px;
+}
+
+.community-ol li:before {
+    content: counter(custom) "  ";
+}
+
+.about-community {
+    background: #ffffff;
+    padding: 10px 20px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.join-form {
+    text-align: center;
+    width: 100%;
+}
+
+#join {
+    width: 250px;
+    border-radius: 10px;
+    border: none;
+    outline: none !important;
+    color: white;
+    background: black;
+    padding: 8px 0px;
+}
+
+.category {
+    background: #ffffff;
+    padding: 10px 0px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.category button {
+    border-radius: 10px;
+    border: none;
+    outline: none !important;
+    padding: 5px 10px;
+    width: 31%;
+}
+
+.new-button:hover {
+    box-shadow: 0 3px 7px rgba(0,0,0,.14);
+    background: rgb(42,194,247);
+    background: linear-gradient(315deg, rgba(42,194,247,1) 0%, rgba(237,224,25,1) 86%);
+}
+
+.trending-button:hover {
+    background: rgb(247,214,42);
+    background: linear-gradient(315deg, rgba(247,214,42,1) 0%, rgba(237,25,25,1) 86%);
+    box-shadow: 0 3px 7px rgba(0,0,0,.14);
+}
+
+.top-button:hover {
+    background: rgb(247,42,201);
+    background: linear-gradient(315deg, rgba(247,42,201,1) 0%, rgba(25,207,237,1) 86%);
+    box-shadow: 0 3px 7px rgba(0,0,0,.14);
+}
+
+/* .category button:hover {
+    background: rgb(237,25,222);
+    background: linear-gradient(315deg, rgba(237,25,222,1) 0%, rgba(247,158,42,1) 86%);
+} */
+  
+.article-title {
+    color: #444444;
+}
+  
+a.article-title:hover {
+    color: #428bca;
+    text-decoration: none;
+}
+  
+.article-content {
+    white-space: pre-line;
+}
+  
+.article-img {
+    height: 65px;
+    width: 65px;
+    margin-right: 16px;
+}
+  
+.article-metadata {
+    padding-bottom: 1px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #e3e3e3
+}
+  
+.article-metadata a:hover {
+    color: #333;
+    text-decoration: none;
+}
+  
+.article-svg {
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}
+  
+.account-img {
+    height: 125px;
+    width: 125px;
+    margin-right: 20px;
+    margin-bottom: 16px;
+}
+  
+.account-heading {
+    font-size: 2.5rem;
+}
+
+
+.communities {
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
+
+#like {
+    position: relative;
+    padding: 0;
+    background: none;
+    border: none;
+    outline: none !important;
+    bottom: 2px;
+}
+
+#dislike {
+    position: relative;
+    padding: 0;
+    background: none;
+    border: none;
+    outline: none !important;
+    top: -2px;
+    margin-left: 4px;
+}
+
+form {
+    display: inline-block;
+}
+
+.picture-calendar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.potd-button {
+    color: black;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none !important;
+    width: 45%;
+}
+
+.potd-button:hover {
+    background: rgb(237,25,222);
+    background: linear-gradient(315deg, rgba(237,25,222,1) 0%, rgba(247,158,42,1) 86%);
+    box-shadow: 0 3px 7px rgba(0,0,0,.14);
+}
+
+.calendar-button {
+    color: black;
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none !important;
+    width: 45%;
+}
+
+.calendar-button:hover {
+    background: rgb(42,74,247);
+    background: linear-gradient(315deg, rgba(42,74,247,1) 0%, rgba(237,25,222,1) 86%);
+    box-shadow: 0 3px 7px rgba(0,0,0,.14);
+}
+
+.create-post {
+    padding: 10px 10px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.create-post input {
+    width: 88%;
+    height: 35px;
+    padding: 5px 10px;
+    outline: none !important;
+    margin-top: 2px;
+    position: relative;
+    top: 2px;
+}
+
+.comment-count {
+    margin-right: 2px;
+}
+
+#save {
+    border: none;
+    outline: none !important;
+    float: right; 
+    color: black; 
+    margin-top: -1px;
+    background: #ffffff;
+}
+
+.save-post {
+    margin-top: -1px;
+    margin-left: 10px;
+}

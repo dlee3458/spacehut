@@ -1,0 +1,13 @@
+<div class="side-content">
+    <h4 style="color: white;">Top Communities</h4>
+    <ol class="community-ol">
+      <hr style="margin-bottom: 8px; margin-top: 0;">
+      {% for community in communities|slice:":5" %}
+        <li><a class="community-links" target="_blank" href="{% url 'community-detail-new' community.name %}"><img src="/media/upload (2).png" width="15" height="15"> <img class="community-pic" src="{{ community.thumbnail.url }}" width="35" height="35"> {{ community.name }}</a></li>
+        <hr style="margin-top: 8px; margin-bottom: 0px;">
+      {% endfor %}
+    </ol>
+    <div>
+      <a href="{% url 'communities' %}"><button class="view-communities-button">View All</button></a>
+    </div>
+</div>

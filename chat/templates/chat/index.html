@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type= "text/css" href="{% static 'forum/chat_popup.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <div class="main" style="border-radius: 10px;">
+        <div class="chat-rooms" style="border-radius: 10px 0px 0px 0px;">
+            <div class="new-chat-room"></div>
+            {% for user_chat_room in user_chat_rooms %}
+                <a href="{% url 'room' user_chat_room.0.number %}" class="chat-room-link-{{ user_chat_room.0.number }}" id="chat-room-link" method="GET" value="{{ user_chat_room.0.number }}" style="color: black; text-decoration: none;">
+                    <input type="hidden" class="chat-notification-count-{{ user_chat_room.0.number }}" value="{{ user_chat_room.1 }}">
+                    <div id="chat-room-{{ user_chat_room.0.number }}" class="chat-room" value="{{ user_chat_room.0.number }}">
+                        <article class="media">
+                            {% for member in user_chat_room.0.users.all %}
+                                {% if member != request.user %}
+                                    <img class="rounded-circle mr-3" src="{{ member.profile.image.url }}" width="30" height="30">
+                                {% endif %}
+                            {% endfor %}
+                            <div class="media-body" id="media-body">
+                                <div class="article-metadata" id='chat-article-metadata'>
+                                    {% for member in user_chat_room.0.users.all %}
+                                        {% if member != request.user %}
+                                            <p class="member-username{{ user_chat_room.0.number }}">{{ member.username }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                    {% if user_chat_room.1 != 0 %}
+                                        <span class="chat-notification-dot" id="notification{{ user_chat_room.0.number }}"></span></span>
+                                    {% else %}
+                                        <span class="chat-notification-dot" id="notification{{ user_chat_room.0.number }}" style="display: none;"></span>
+                                    {% endif %}
+                                    {% if user_chat_room.0.latest_message %}
+                                        <p class="article-content text-muted" id='last-message{{ user_chat_room.0.number }}' style="display: inline-block;">{{ user_chat_room.0.latest_message|truncatechars:70 }}</p>
+                                    {% else %}
+                                        <p class="article-content text-muted" id='last-message{{ user_chat_room.0.number }}' style="display: inline-block;"></p>
+                                    {% endif %}
+                            </div>
+                            <div class="article-metadata">
+                                <p class="latest-message-date{{ user_chat_room.0.number }}">{{ user_chat_room.0.latest_message_date|date:"M j" }}</p>
+                            </div>
+                        </article>
+                        <hr class="chat-room-line">
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <button class="start-new-chat">
+            <img src="/media/chat-bubble (2).svg" width="20" height="20">
+            <p style="display: inline-block;">Start a chat</p>
+        </button>
+        <div class="chat-area" id="ajaxify-chat-area" style="border-radius: 0px;">
+            <button id="chat-hamburger"><img class="hamburger" src="/media/hamburger (1).svg" width="30" height="30"></button>
+            <div class="chat-box">
+                <div class="stars" style="border-radius: 10px 10px 10px;"></div>
+                <div class="twinkling" style="border-radius: 10px;"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

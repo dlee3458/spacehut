@@ -1,0 +1,7 @@
+{% if request.user in post.saves.all %}
+    <button style="color: red;" type="submit" id="save" name="post_id" value="{{ post.id }}" class="save-button{{ post.id }}"><img class="save-post" src="/media/save-button.svg" width="20" height="20">Unsave</button>
+{% else %}
+    <button type="submit" id="save" name="post_id" value="{{ post.id }}" class="save-button{{ post.id }}"><img class="save-post" src="/media/save-button (1).svg" width="20" height="20">Save</button>
+{% endif %}
+
+{% include 'forum/messages.html' %}

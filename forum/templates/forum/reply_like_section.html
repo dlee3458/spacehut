@@ -1,0 +1,27 @@
+{% if request.user.is_authenticated %}
+    <form action="{% url 'like_reply' %}" method="post">
+        {% csrf_token %}
+        {% if user in reply.likes.all %}
+            <button type="submit" id='like-reply' name="reply_id" value="{{ reply.id }}" class="reply-like-button{{ reply.id }}"><img class="like-img{{ post.id }}" src="/media/upload.svg" width="20" height="20"></button>
+            <span style="color: rgb(64, 128, 211);">{{ reply.likes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='like-reply' name="reply_id" value="{{ reply.id }}" class="reply-like-button{{ reply.id }}"><img class="like-img{{ post.id }}" src="/media/up-arrow.svg" width="20" height="20"></button>
+            {{ reply.likes.all.count }}
+        {% endif %}
+    </form>
+    <form action="{% url 'dislike_reply' %}" method="post">
+        {% csrf_token %}
+        {% if user in reply.dislikes.all %}
+            <button type="submit" id='dislike-reply' name="reply_id" value="{{ reply.id }}" class="reply-dislike-button{{ reply.id }}"><img class="dislike-img{{ post.id }}" src="/media/upload (1).svg" width="20" height="20"></button>
+            <span style="color: rgb(241, 65, 65);">{{ reply.dislikes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='dislike-reply' name="reply_id" value="{{ reply.id }}" class="reply-dislike-button{{ reply.id }}"><img class="dislike-img{{ post.id }}" src="/media/up-arrow (1).svg" width="20" height="20"></button>
+            {{ reply.dislikes.all.count }}
+        {% endif %}
+    </form>
+{% else %}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow.svg" width="20" height="20" style="margin-bottom: 2px;" disabled></a>
+        {{ comment.likes.count }}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow (1).svg" width="20" height="20" style="margin-bottom: 2px; margin-left: 4px;" disabled></a>
+        {{ comment.dislikes.all.count }}
+{% endif %}

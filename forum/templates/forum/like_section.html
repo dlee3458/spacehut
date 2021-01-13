@@ -1,0 +1,31 @@
+{% if request.user.is_authenticated %}
+    <form action="{% url 'like_post' %}" method="post">
+        {% csrf_token %}
+        {% if request.user in post.likes.all %}
+            <button type="submit" id='like' name="post_id" value="{{ post.id }}" class="like-button{{ post.id }}"><img class="like-img" src="/media/upload.svg" width="20" height="20"></button>
+            <span style="color: rgb(64, 128, 211);">{{ post.likes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='like' name="post_id" value="{{ post.id }}" class="like-button{{ post.id }}"><img class="like-img" src="/media/up-arrow.svg" width="20" height="20"></button>
+            {{ post.likes.all.count }}
+        {% endif %}
+    </form>
+    <form action="{% url 'dislike_post' %}" method="post">
+        {% csrf_token %}
+        {% if request.user in post.dislikes.all %}
+            <button type="submit" id='dislike' name="post_id" value="{{ post.id }}" class="dislike-button{{ post.id }}"><img class="dislike-img" src="/media/upload (1).svg" width="20" height="20"></button>
+            <span style="color: rgb(241, 65, 65);">{{ post.dislikes.all.count }}</span>
+        {% else %}
+            <button type="submit" id='dislike' name="post_id" value="{{ post.id }}" class="dislike-button{{ post.id }}"><img class="dislike-img" src="/media/up-arrow (1).svg" width="20" height="20"></button>
+            {{ post.dislikes.all.count }}
+        {% endif %}
+    </form>
+    {% include 'forum/save_post.html' %}
+    <a href="{% url 'post-detail' post.id %}" id="post-details" style="float: right; color: black; text-decoration: none;"><img class="comment-count" src="/media/chat.png">{{ post.post.count }}</a>
+{% else %}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow.svg" width="20" height="20" style="margin-bottom: 2px;" disabled></a>
+        {{ post.likes.count }}
+        <a href="{% url 'login' %}"><img src="/media/up-arrow (1).svg" width="20" height="20" style="margin-bottom: 2px; margin-left: 4px;" disabled></a>
+        {{ post.dislikes.all.count }}
+        <a href="{% url 'post-detail' post.id %}"><img src="/media/chat.png" style="float: right; margin-left: 8px;"></a> <span style="float: right;">{{ post.post.count }}</span>
+{% endif %}
+

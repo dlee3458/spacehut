@@ -1,0 +1,26 @@
+<div class="user-info">
+    <img class="rounded-circle" src="{{ user.profile.image.url }}" width="80" height="80" style="margin-bottom: 10px;"> {{ user }}
+    <hr>
+    <div class="space-points">
+      <p>Space Points</p>
+      <img src="/media/star.svg" width="20" height="20" style="margin-top: -4px;"> {{ space_points }}
+    </div>
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'room' chat_id %}" id="chat-room-link" value="{{ chat_id }}" method="GET"><button class="chat-button">Chat</button></a>
+      {% if is_following %}
+        <a href="{% url 'follow-user' user %}"><button href="{% url 'follow-user' user %}" method="POST" class="follow-button">Unfollow</button></a>
+      {% else %}
+        <a href="{% url 'follow-user' user %}"><button href="{% url 'follow-user' user %}" method="POST" class="follow-button">Follow</button></a>
+      {% endif %}
+    {% endif %}
+</div>
+<div class="side-content">
+    <h4 style="color: white;">{{ user.username }}'s Communities</h4>
+    <ol class="community-ol">
+      <hr style="margin-bottom: 8px; margin-top: 0;">
+      {% for community in communities|slice:":5" %}
+        <li><a class="community-links" href="{% url 'community-detail-new' community.name %}" target="__blank"><img src="/media/upload (2).png" width="15" height="15"> <img src="{{ community.thumbnail.url }}" width="35" height="35"> {{ community.name }}</a></li>
+        <hr style="margin-top: 8px; margin-bottom: 0px;">
+      {% endfor %}
+    </ol>
+</div>

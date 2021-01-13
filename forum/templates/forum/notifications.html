@@ -1,0 +1,73 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+    <div class="ajaxify">
+        {% for notification in user_notifications_list %}
+            <div class="notification">
+                {% if notification.like_post_notification %}
+                    <img src="/media/like.svg" width="20" height="20">
+                    <div class="notification-details">
+                        <a class="notification-link" href="{% url 'post-detail' notification.post.id %}">
+                            <input type="hidden" value="<img src='{{ notification.post.community.thumbnail.url }}' width='20' height='20'> {{ notification.post.community }} ">
+                            <span data-content="{{ notification.sender }} liked your post in {{ notification.post.community }}" aria-hidden="true"></span>
+                            <p style="color: red;">{{ notification.sender }} liked your post in {{ notification.post.community }}</p>
+                        </a>
+                        <p>{{ notification.post }}</p>
+                        <p class="small text-muted">{{ notification.date }}</p>
+                    </div>
+                
+                {% elif notification.like_comment_notification %}
+                    <img src="/media/testimonials.svg" width="25" height="25">
+                    <div class="notification-details">
+                        <a class="notification-link" href="{% url 'post-comment-notification' post_id=notification.post.id comment_id=notification.comment.id %}">
+                            <input type="hidden" value="<img src='{{ notification.post.community.thumbnail.url }}' width='20' height='20'> {{ notification.post.community }} ">
+                            <span data-content="{{ notification.sender }} liked your comment in {{ notification.post.community }}" aria-hidden="true"></span>
+                            <p style="color: red;">{{ notification.sender }} liked your comment in {{ notification.post.community }}</p>
+                        </a>
+                        <p>{{ notification.comment.content }}</p>
+                        <p class="small text-muted">{{ notification.date }}</p>
+                    </div>
+                
+                {% elif notification.comment_notification %}
+                    <img src="/media/chat.png" width="20" height="20">
+                    <div class="notification-details">
+                        <a class="notification-link" href="{% url 'post-comment-notification' post_id=notification.post.id comment_id=notification.comment.id  %}">
+                            <input type="hidden" value="<img src='{{ notification.post.community.thumbnail.url }}' width='20' height='20'> {{ notification.post.community }} ">
+                            <span data-content="{{ notification.sender }} replied to your post in {{ notification.post.community }}" aria-hidden="true"></span>
+                            <p style="display: inline-block; color: red;">{{ notification.sender }} replied to your post in {{ notification.post.community }}</p>
+                        </a>
+                        <p>{{ notification.comment.content }}</p>
+                        <p class="small text-muted">{{ notification.date }}</p>
+                    </div>
+                
+                {% elif notification.reply_notification %}
+                    <img src="/media/reply.svg" width="20" height="20">
+                    <div class="notification-details">
+                        <a class="notification-link" href="{% url 'post-comment-notification' post_id=notification.post.id comment_id=notification.comment.id  %}">
+                            <input type="hidden" value="<img src='{{ notification.post.community.thumbnail.url }}' width='20' height='20'> {{ notification.post.community }} ">
+                            <span data-content="{{ notification.sender }} replied to your comment in {{ notification.post.community }}" aria-hidden="true"></span>
+                            <p style="display: inline-block; color: red;">{{ notification.sender }} replied to your comment in {{ notification.post.community }}</p>
+                        </a>
+                        <p class="small"><button class="parent-comment" value="{{ notification.comment.id }}">Show parent comment</button></p>
+
+                        {% if notification.comment.reply_parent %}
+                            <p class="show-parent{{ notification.comment.id }} small" style="display: none; color: rgb(0, 81, 255);">{{ notification.comment.reply_parent.content }}</p>
+                        {% else %}
+                            <p class="show-parent{{ notification.comment.id }} small" style="display: none; color: rgb(0, 81, 255);">{{ notification.comment.parent.content }}</p>
+                        {% endif %}
+                        <p>{{ notification.comment.content }}</p>
+                        <p class="small text-muted">{{ notification.date }}</p>
+                    </div>
+                
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
+
+{% block sidecontent %}
+    <div class="right-side">
+        {% include 'forum/main_community_list.html' %}
+    </div>
+{% endblock sidecontent %}
+

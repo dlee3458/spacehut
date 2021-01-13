@@ -1,0 +1,63 @@
+<div class="chat-popup-tabbar">
+    <button id="chat-hamburger2"><img class="hamburger2" src="/media/hamburger (1).svg" width="20" height="20"></button>
+    <p class="user-tab" style="display: inline-block;"></p>
+    <button type="button" class="chat-tab-icon"><img id="close-chat" src="/media/close.svg" width="15" height="15" style="top: 6px;"></button>
+    <button type="button" class="chat-tab-icon"><img id="minimize-chat" src="/media/minus-sign.svg" width="20" height="20" style="top: 4px;"></button>
+    <a href="{% url 'room' chat_room_id %}" id="maximize-chat" target="__blank"><button type="button" class="chat-tab-icon"><img src="/media/maximize.svg" width="15" height="15" style="top: 6px;"></button></a>
+</div>
+<div class="chat-box">
+    <div class="stars" style="border-radius: 10px 10px 0px;"></div>
+    <div class="twinkling" style="border-radius: 10px;"></div>
+    <input type="hidden" id="user" value="{{ user.username }}">
+    <input type="hidden" id="other-user" value="{{ other_user.username }}">
+    {% for message in messages %}
+        {% if message.author == request.user %}
+            <div class="current-user-message-box">
+                <div class="current-user-message">
+                    {{ message.content }}
+                </div>
+                <div class="date-box">
+                    <p class="current-user-message-date">{{ message.timestamp|date:"g:i A | M j" }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="other-user-message-box">
+                <img src="{{ other_user.profile.image.url }}" class="chat-user-img">
+                <div class="new-message-details">
+                    <div class="other-user-message">
+                        {{ message.content }}
+                    </div>
+                    <p class="other-user-message-date">{{ message.timestamp|date:"g:i A | M j" }}</p>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+<div class="send-chat input-group">
+    <hr>
+    <input class="form-control" id="chat-message-input" type="text" aria-describedby="button-addon">
+    <div class="input-group-append">
+        <button class="chat-message-submit" id="button-addon" type="submit" value="{{ chat_room_id }}"><img src="/media/send.svg" width="20" height="20"></button>
+    </div>
+</div>
+
+
+{{ room_name|json_script:"room-name" }}
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+<script>
+    var chatBox = document.querySelector('.chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    var pk = document.querySelector('.chat-message-submit').value;
+    var chat_room = document.querySelector('#chat-room-' + pk);
+    var last_message = document.querySelector('#last-message' + pk);
+    chat_room.className = "active-chat-room";
+    last_message.className = "selected";
+
+    // Undo previous active chatroom
+    $(document).on('click', '#chat-room-link', function(event) {
+        chat_room.className = 'chat-room'
+        last_message.className = 'article-content text-muted'
+    })
+</script>

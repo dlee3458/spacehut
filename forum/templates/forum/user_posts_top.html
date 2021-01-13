@@ -1,0 +1,52 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+    <div class="ajaxify">
+        <div class="user-info-mobile">
+            {% include 'forum/user_info.html' %}
+        </div>
+        <div class="category">
+            <a href="{% url 'user-posts' user.username %}"><button class="user-new-button" value="{{ user.username }}"><img src="/media/new.svg" width="20" height="20" style="margin-bottom: 3px; margin-right: 2px;">New</button></a>
+            <a href="{% url 'user-posts-trending' user.username %}"><button class="user-trending-button" value="{{ user.username }}"><img src="/media/trending.svg" width="20" height="20" style="margin-bottom: 3px;">Trending</button></a>
+            <a href="{% url 'user-posts-top' user.username %}"><button class="user-top-button-selected" value="{{ user.username }}"><img src="/media/self-growth.svg" width="20" height="20" style="margin-right: 2px;">Top</button></a>
+        </div>
+        <div class="infinite-container">  
+            {% for post in posts %}
+                <div class="infinite-item">
+                    <article class="media content-section">
+                        <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                            <div class="media-body">
+                                <div class="article-metadata" id="article-metadata">
+                                    {% if post.author == request.user %}
+                                        <a class="logged-in mr-2">{{ post.author }}</a>
+                                    {% else %}
+                                        <a class="different-user mr-2">{{ post.author }}</a>
+                                    {% endif %}
+                                    <small class="text-muted">{{ post.date_posted|date:'F d' }}</small>
+                                    <a href="{% url 'community-detail-new' post.community.name %}" class="community-detail-new"><small class="text-muted" style="float: right; margin-left: 4px;">{{ post.community }}</small><img src="{{ post.community.thumbnail.url }}" width="20" height="20" style="float: right;"></a>
+                                </div>
+                                <h2><a class="article-title" href="{% url 'post-detail' post.id %}" id="post-details">{{ post.title }}</a></h2>
+                                <p class="article-content">{{ post.content }}</p>
+                                {% if post.image %}
+                                    <img src="{{ post.image.url }}" alt="" class="img-fluid">
+                                {% endif %}
+                                <div class="total-comments-likes{{ post.id }}" style="margin-top: 8px;">
+                                    {% include 'forum/like_section.html' %}
+                                </div>
+                            </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if posts.has_next %}
+            <a class="infinite-more-link" href="?page={{ posts.next_page_number }}"></a>
+        {% endif %}
+    </div>
+{% endblock content %}
+
+{% block sidecontent %}
+    <div class="right-side">
+        {% include 'forum/user_info.html' %}
+    </div>
+{% endblock sidecontent %}

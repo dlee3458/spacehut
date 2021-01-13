@@ -1,0 +1,105 @@
+<div class="container-fluid mt-2 mb-5">
+    <div class="form-group row">
+      {% if request.user.is_authenticated %}
+        <img class="rounded-circle" src="{{ user.profile.image.url }}" width="40" height="40">
+      {% else %}
+        <img class="rounded-circle" src="/media/profile-user.svg" width="40" height="40">
+      {% endif %}
+      <form method='post' class="comment-form" action="" value="{{ post.id }}">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        {% if request.user.is_authenticated %}
+          <input type="submit" class="btn btn-outline-success">
+        {% else %}
+          <input type="submit" class="btn btn-outline-success" disabled>
+        {% endif %}
+      </form>
+    </div>
+    <a class="view-all-comments" style="float: right;" href="{% url 'post-detail' post.id %}">View all threads</a>
+</div>
+{% for comment in comments %}
+  {% if comment == main_comment %}
+    <article class="media main-comment mb-4">
+  {% else %}
+    <article class="media comment-section mb-4">
+  {% endif %}
+    <img class="rounded-circle" src="{{ comment.user.profile.image.url }}" width="40" height="40">
+        <div class="media-body ml-2">
+            <div>
+                {% if comment.user == request.user %}
+                  <a class="logged-in mr-2" href="{% url 'user-posts' comment.user.username %}">{{ comment.user.username }}</a>
+                {% else %}
+                  <a class="different-user mr-2" href="{% url 'user-posts' comment.user.username %}">{{ comment.user.username }}</a>
+                {% endif %}
+                <small class="text-muted">{{ comment.timestamp|date:'F d, Y' }}</small>
+                <p>{{ comment.content }}</p>
+            </div>
+            <div class="comments-likes{{ comment.id }}">
+              {% include 'forum/comment_like_section.html' %}
+            </div>
+            <button id="reply-btn{{ comment.id }}" type="button" value="{{ comment.id }}" name="button" class="reply-btn btn btn-outline-dark btn-sm">Reply</button>
+            <button id="cancel-btn{{ comment.id }}" type="button" value="{{ comment.id }}" name="button" class="cancel-btn btn btn-outline-dark btn-sm" style="display: none;">Cancel</button>
+            <div class="reply-form-group{{ comment.id }}" style="display: none;">
+              <img class="rounded-circle" id="reply-profile-img" src="{{ user.profile.image.url }}" width="30" height="30">
+              <form method='post' class="comment-form" id="reply-form" action="" value="{{ post.id }}">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                {% if request.user.is_authenticated %}
+                  <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                  <input type="submit" class="confirm-reply btn btn-outline-success" value="Reply" style="float: right;">
+                {% else %}
+                  <input type="submit" value="Reply" class="btn btn-outline-success" disabled>
+                {% endif %}
+              </form>
+            </div>
+          </div>
+  </article>
+
+  <div class="replied-comments container">
+    {% for reply in comment.replies.all %}
+      {% if reply == main_comment %}
+        <article class="media main-comment mb-4">
+      {% else %}
+        <article class="media comment-section mb-4">
+      {% endif %}
+        <img class="rounded-circle" src="{{ reply.user.profile.image.url }}" width="40" height="40">
+            <div class="media-body ml-2">
+                <div>
+                    {% if reply.user == request.user %}
+                      <a class="logged-in mr-2" href="{% url 'user-posts' reply.user.username %}">{{ reply.user.username }}</a>
+                    {% else %}
+                      <a class="different-user mr-2" href="{% url 'user-posts' reply.user.username %}">{{ reply.user.username }}</a>
+                    {% endif %}
+                    <small class="text-muted">{{ reply.timestamp|date:'F d, Y' }}</small>
+                    {% if reply.reply_parent.user %}
+                      <p><span style="color: red;">@{{ reply.reply_parent.user }}</span> {{ reply.content }}</p>
+                    {% else %}
+                      <p>{{ reply.content }}</p>
+                    {% endif %}
+                </div>
+                <div class="replies-likes{{ reply.id }}">
+                  {% include 'forum/reply_like_section.html' %}
+                </div>
+                <button id="reply-reply-btn{{ reply.id }}" type="button" value="{{ reply.id }}" name="button" class="reply-reply-btn btn btn-outline-dark btn-sm">Reply</button>
+                <button id="reply-cancel-btn{{ reply.id }}" type="button" value="{{ reply.id }}" name="button" class="reply-cancel-btn btn btn-outline-dark btn-sm" style="display: none;">Cancel</button>
+                <p class="reply-recipient{{ reply.id }}" style="color: red; display: none">Replying to {{ reply.user }}</p>
+                <div class="reply-reply-form-group{{ reply.id }}" style="display: none;">
+                  <img class="rounded-circle" id="reply-profile-img" src="{{ user.profile.image.url }}" width="30" height="30">
+                  <form method='post' class="comment-form" id="reply-reply-form" action="" value="{{ post.id }}">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    {% if request.user.is_authenticated %}
+                      <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                      <input type="hidden" name="reply_parent_id" value="{{ reply.id }}">
+                      <input type="submit" class="confirm-reply btn btn-outline-success" value="Reply" style="float: right;">
+                    {% else %}
+                      <input type="submit" value="Reply" class="btn btn-outline-success" disabled>
+                    {% endif %}
+                  </form>
+                </div>
+              </div>
+      </article>
+    {% endfor %}
+  </div>        
+
+{% endfor %}

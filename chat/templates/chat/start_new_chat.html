@@ -1,0 +1,107 @@
+<div class="new-chat-form-box">
+    <input class="request_user" type="hidden" value="{{ request.user.id }}">
+    <p style="margin: 0; display: inline-block;">Start new chat</p>
+    <p class="user-tab" style="display: inline-block;"></p>
+    <button type="button" class="chat-tab-icon"><img id="close-chat" src="/media/close.svg" width="15" height="15" style="position: relative; top: -5px;"></button>
+    <button type="button" class="chat-tab-icon"><img id="minimize-chat" src="/media/minus-sign.svg" width="20" height="20" style="position: relative; top: -5px;"></button>
+    <hr>
+    <div class="search-user">
+        <p style="display: inline-block; margin: 0;">To: </p>
+        <div class="selected-user" style="display: none;">
+
+        </div>
+        <form action="" method="POST">
+            <input class="input-user" type="text" value="" name="input_user" style="display: inline-block;">
+        </form>
+        <hr>
+    </div>
+    <div class="users" id="replaceable-content">
+        <ul class="followings-list">
+            {% for following in followings %}
+            <input class="user_id_{{ following }}" type="hidden" value="{{ following.id }}">
+            <li class="user" value="{{ following }}">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="{{ following }}">
+                    <label class="form-check-label" id="user-{{ following }}" for="{{ following }}">
+                        <img class="rounded-ciricle" src="{{ following.profile.image.url }}" width="30" height="30"> {{ following }}
+                    </label>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="bottom-tab">
+        <hr>
+        <button class="cancel-chat">Cancel</button>
+        <button class="start-chat" id="chat-room-link" href="" value="">Start chat</button>
+    </div>
+</div>
+
+<script>
+    // As-you-type search
+    $('.input-user').on('keyup', function (event) {
+        event.preventDefault();
+        var users_div = $('#replaceable-content');
+        var user_input = $(this).val();
+
+        if(user_input == "") {
+            $.ajax({
+                type: 'GET',
+                url: '{% url "start-new-chat" %}',
+                success: function(response){
+                    $('#ajaxify-chat-area').html(response['form']);
+                    $('.input-user').focus();
+                }
+            })
+        } else {
+            $.ajax({
+            type: 'GET',
+            url: '{% url "find-user" 999 %}'.replace(999, user_input),
+            success: function(response){
+                console.log('hi')
+                users_div.fadeTo('slow', 0).promise().then(() => {
+                    // replace the HTML contents
+                    users_div.html(response['matched_users'])
+                    // fade-in the div with new contents
+                    users_div.fadeTo('slow', 1)
+                })
+            },
+            timeout: 400
+            });
+        }
+    });
+
+    $('.cancel-chat').on('click', function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '{% url "chat-index" %}',
+            success: function(response){
+                $('.chat-popup').html(response['chat_index']);
+            }
+        })
+    });
+
+    // Close chat popup when user clicks on close icon
+    $("#close-chat").on('click', function(event) {
+        $(".chat-popup").toggle();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    });
+
+    // Minimize chat popup when user clicks on minimize icon
+    $("#minimize-chat").on('click', function(event) {
+        $(".chat-popup").fadeToggle();
+        $(".minimized-chat").fadeToggle();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    });
+
+    // Display chat popup when user clicks on minimized chat icon
+    $(".minimized-chat").on('click', function(event) {
+        $(".chat-popup").fadeToggle();
+        $(".minimized-chat").fadeToggle();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    });
+</script>

@@ -1,0 +1,10 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+    <h1 style="color: red;">ACCESS DENIED!</h1>
+    <p>You can not view other users' notifications!</p>
+{% endblock content %}
+
+{% block sidecontent %}
+    {% include 'forum/main_community_list.html' %}
+{% endblock sidecontent %}

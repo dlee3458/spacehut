@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type= "text/css" href="{% static 'forum/chat_popup.css' %}">
+    <title>Chat Room</title>
+</head>
+<body>
+    <div class="main" style="border-radius: 10px;">
+        <div class="chat-rooms" style="border-radius: 10px 0px;">
+            {% for user_chat_room in user_chat_rooms %}
+                <a href="{% url 'room' user_chat_room.0.number %}" class="chat-room-link-{{ user_chat_room.0.number }}" id="chat-room-link" method="GET" value="{{ user_chat_room.0.number }}" style="color: black; text-decoration: none;">
+                    <input class="chat-notification-count-{{ user_chat_room.0.number }}" value="0" style="display: none;">
+                    <div id="chat-room-{{ user_chat_room.0.number }}" class="chat-room" value="{{ user_chat_room.0.number }}">
+                        <article class="media">
+                            {% for member in user_chat_room.0.users.all %}
+                                {% if member != request.user %}
+                                    <img class="rounded-circle mr-3" src="{{ member.profile.image.url }}" width="30" height="30">
+                                {% endif %}
+                            {% endfor %}
+                            <div class="media-body" id="media-body">
+                                <div class="article-metadata" id='chat-article-metadata'>
+                                    {% for member in user_chat_room.0.users.all %}
+                                        {% if member != request.user %}
+                                            <p class="member-username{{ user_chat_room.0.number }}">{{ member.username }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% if user_chat_room.0.latest_message %}
+                                    <p class="article-content text-muted" id='last-message{{ user_chat_room.0.number }}'>{{ user_chat_room.0.latest_message|truncatechars:70 }}</p>
+                                {% else %}
+                                    <p class="article-content text-muted" id='last-message{{ user_chat_room.0.number }}'></p>
+                                {% endif %}
+
+                            </div>
+                            <div class="article-metadata">
+                                <p>{{ user_chat_room.0.latest_message_date|date:"M j" }}</p>
+                                {% if user_chat_room.1 != 0 %}
+                                    <span class="chat-notification-dot" id="notification{{ user_chat_room.0.number }}"></span></span>
+                                {% else %}
+                                    <span class="chat-notification-dot" id="notification{{ user_chat_room.0.number }}" style="display: none;"></span>
+                                {% endif %}
+                            </div>
+                        </article>
+                        <hr class="chat-room-line">
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="chat-area" style="border-radius: 0px;">
+            <div class="chat-popup-tabbar">
+                <p class="user-tab" style="display: inline-block;"></p>
+                <button type="button" class="chat-tab-icon"><img id="close-chat" src="/media/close.svg" width="15" height="15" style="top: 6px;"></button>
+                <button type="button" class="chat-tab-icon"><img id="minimize-chat" src="/media/minus-sign.svg" width="20" height="20" style="top: 4px;"></button>
+                <button type="button" class="chat-tab-icon"><img src="/media/maximize.svg" width="15" height="15" style="top: 6px;"></button>
+            </div>
+            <div class="chat-box">
+                <div class="stars" style="border-radius: 10px 10px 0px;"></div>
+                <div class="twinkling" style="border-radius: 10px;"></div>
+                <input type="hidden" id="user" value="{{ user.username }}">
+                <input type="hidden" id="other-user" value="{{ other_user.username }}">
+                {% for message in messages %}
+                    {% if message.author == request.user %}
+                        <div class="current-user-message-box">
+                            <div class="current-user-message">
+                                {{ message.content }}
+                            </div>
+                            <div class="date-box">
+                                <p class="current-user-message-date">{{ message.timestamp|date:"g:i A | M j" }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="other-user-message-box">
+                            <img src="{{ other_user.profile.image.url }}" class="chat-user-img">
+                            <div class="new-message-details">
+                                <div class="other-user-message">
+                                    {{ message.content }}
+                                </div>
+                                <p class="other-user-message-date">{{ message.timestamp|date:"g:i A | M j" }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="send-chat input-group">
+                <hr>
+                <input class="form-control" id="chat-message-input" type="text" aria-describedby="button-addon">
+                <div class="input-group-append">
+                    <button class="chat-message-submit" id="button-addon" type="submit" value="{{ chat_room_id }}"><img src="/media/send.svg" width="20" height="20"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ room_name|json_script:"room-name" }}
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+
+    <script>
+        var chatBox = document.querySelector('.chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        var pk = document.querySelector('.chat-message-submit').value;
+        var chat_room = document.querySelector('#chat-room-' + pk);
+        var last_message = document.querySelector('#last-message' + pk);
+        chat_room.style.background = "rgb(0,121,211)";
+        chat_room.style.backgroundClip = "border-box";
+        chat_room.style.color = "white";
+        last_message.className = "selected"
+    </script>
+</body>
+</html>

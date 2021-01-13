@@ -1,0 +1,39 @@
+<a href="{% url 'room' user_chat_room.number %}" class="chat-room-link-{{ user_chat_room.number }}" id="chat-room-link" method="GET" value="{{ user_chat_room.number }}" style="color: black; text-decoration: none;">
+    <input type="hidden" class="chat-notification-count-{{ user_chat_room.number }}" value="0">
+    <div id="chat-room-{{ user_chat_room.number }}" class="active-chat-room" value="{{ user_chat_room.number }}">
+        <article class="media">
+            {% for member in user_chat_room.users.all %}
+                {% if member != request.user %}
+                    <img class="rounded-circle mr-3" src="{{ member.profile.image.url }}" width="30" height="30">
+                {% endif %}
+            {% endfor %}
+            <div class="media-body" id="media-body">
+                <div class="article-metadata" id='chat-article-metadata'>
+                    {% for member in user_chat_room.users.all %}
+                        {% if member != request.user %}
+                            <p class="member-username{{ user_chat_room.number }}">{{ member.username }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if user_chat_room.latest_message %}
+                    <p class="selected" id='last-message{{ user_chat_room.number }}'>{{ user_chat_room.latest_message|truncatechars:70 }}</p>
+                {% else %}
+                    <p class="selected" id='last-message{{ user_chat_room.number }}'></p>
+                {% endif %}
+
+            </div>
+            <div class="article-metadata">
+                <p class="latest-message-date{{ user_chat_room.number }}">{{ user_chat_room.latest_message_date|date:"M j" }}</p>
+                <span class="chat-notification-dot" id="notification{{ user_chat_room.number }}"></span>
+            </div>
+        </article>
+        <hr class="chat-room-line">
+    </div>
+</a>
+
+<script>
+    $(document).on('click', '#chat-room-link', function(event) {
+        $('.active-chat-room').attr('class', 'chat-room');
+        $('.selected').attr('class', 'article-content text-muted');
+    })
+</script>

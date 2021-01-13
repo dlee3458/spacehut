@@ -1,0 +1,9 @@
+<div class="about-community" value="{{ community.name }}">
+    <small class="text-muted">About {{ community.name }} <img src="{{ community.thumbnail.url }}" width="25" height="25"></small>
+    <p>{{ community.about }}</p>
+    <p>Created by {{ community.creator }}</p>
+    <hr>
+    <div class="join-form">
+        {% include 'forum/join_community.html' %}
+    </div>
+</div>

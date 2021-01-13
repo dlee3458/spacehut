@@ -1,0 +1,17 @@
+<div class="join-community">
+    <p>{{ community.members.count }} member{{ community.members.count|pluralize }}</p>
+    {% if request.user.is_authenticated %}
+        <form class="community-form" action="{% url 'join_community' %}" method="post">
+            {% csrf_token %}
+            {% if user in community.members.all %}
+                <button type="submit" id='join' name="community_id" value="{{ community.id }}" class="join-button">Leave</button>
+            {% else %}
+                <button type="submit" id='join' name="community_id" value="{{ community.id }}" class="join-button">Join</button>
+            {% endif %}
+        </form>
+    {% else %}
+        <a href="{% url 'login' %}"><button id="join">Join</button></a>
+    {% endif %}
+</div>
+
+{% include 'forum/messages.html' %}

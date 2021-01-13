@@ -1,0 +1,1665 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type= "text/css" href="{% static 'forum/main.css' %}">
+    <script src="{% static '/js/websocketbridge.js' %}" type="text/javascript"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/media/rocket.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/media/rocket.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/media/rocket.png">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand navbar-dark bg-steel fixed-top">
+          <div class="stars"></div>
+          <div class="twinkling"></div>
+          <div class="container">
+            <a class="navbar-brand mr-4" id="site-logo" href="{% url 'forum-home' %}">
+              <img src="/media/rocket.png" width="50" height="50">
+              SpaceHut
+            </a>
+            <a class="navbar-brand mr-4" id="small-site-logo" href="{% url 'forum-home' %}">
+              <img src="/media/rocket.png" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+              <li class="navbar-nav mr-auto nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="section-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <img src="{{ section_img }}" onerror="this.style.display='none'" width="20" height="20"> <span class="section-name"> {{ section }} </span>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="section-dropdown">
+                  <a class="dropdown-item" id="home" href="{% url 'forum-home' %}"><img src="/media/house.svg" height="20" width="20"> <span> Home </span></a>
+                  <span class="view-communities-button"><a class="dropdown-item" href="{% url 'communities' %}"><img src="/media/community.svg" height="20" width="20"> <span> Communities </span></a></span>
+                  {% if request.user.is_authenticated %}
+                    <span class="home-create-post"><a class="dropdown-item" href="{% url 'home-post' %}"><img src="/media/writing.svg" height="20" width="20"> <span> Create Post </span></a></span>
+                    <div class="dropdown-divider"></div>
+                    <p class="dropdown-item" id="personal-communities-dropdown">MY COMMUNITIES</p>
+                    {% for community in personal_communities %}
+                      <a class="dropdown-item" id="personal-community-list" href="{% url 'community-detail-new' community.name %}"><img src="{{ community.thumbnail.url }}" height="20" width="20"> <span> {{ community }} </span></a>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </li>
+              <!-- Navbar Right Side -->
+              <div class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                  <a class="notification-icon" href="{% url 'notifications' request.user %}"><img class="notification-img" src="/media/bell (1).svg" width="25" height="25">
+                  {% if notifications %}
+                    <span class="notification-badge" value="{{ notifications }}">{{ notifications }}</span>
+                  {% else %}
+                    <span class="notification-badge" id="show-notification-badge" value="{{ notifications }}" style="display: none;">{{ notifications }}</span>
+                  {% endif %}
+                  </a>
+                  <a class="chat-icon" id="chat-btn"><img class="chat-img" src="/media/chat-box.svg" width="30" height="30">
+                  {% if chat_notifications %}
+                    <span class="chat-notification-badge" value="{{ notifications }}">{{ chat_notifications }}</span>
+                  {% else %}
+                    <span class="chat-notification-badge" id="show-chat-notification-badge" value="{{ notifications }}" style="display: none;">{{ chat_notifications }}</span>
+                  {% endif %}
+                  </a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img class="rounded-circle" id="user-dropdown" src="{{ request.user.profile.image.url }}" width="30" height="30"> <span class="user-dropdown-name">{{ request.user.username }}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="{% url 'profile' %}" id="personal-profile"><img src="/media/user.svg" width="20" height="20"> Profile</a>
+                      <a class="dropdown-item" href="{% url 'saved' %}" id="saved-posts"><img src="/media/floppy-disk.svg" width="20" height="20"> Saved</a>
+                      </a>
+                      <a class="dropdown-item" href="{% url 'community-create' %}" id="create-community"><img src="/media/people.svg" width="20" height="20"> Create Community</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="{% url 'logout' %}"><img src="/media/arrow.svg" width="20" height="20"> Logout</a>
+                    </div>
+                  </li>
+                {% else %}
+                  <a class="nav-item nav-link" id="login" href="{% url 'login' %}">Login</a>
+                  <a class="nav-item nav-link" id="register" href="{% url 'register' %}">Register</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </nav>
+    </header>
+    {% block topcontent %}
+      <div class="community-header"></div>
+    {% endblock %}
+    <main role="main" class="container">
+      <div class="row">
+        <div class="col-md-8">
+          {% block content %}{% endblock %}
+        </div>
+        <div class="col-md-4">
+          <div class="sticky-top">
+          {% block sidecontent %}{% endblock %}
+          </div>
+        </div>
+      </div>
+      {% block chat_popup %}
+        <div>
+          <button type="button" class="minimized-chat"><img src="/media/chat.svg" width="50" height="50"></button>
+        </div>
+        <div class="chat-popup">
+            {% include 'chat/index.html' %}
+        </div>
+      {% endblock %}
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/shortcuts/infinite.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(event){
+        $('.nav-link').each(function(){
+          if ($(this).prop('href') == window.location.href) {
+              $(this).addClass('active');
+          }
+        });
+
+        $('.reply-btn').click(function() {
+          var pk = $(this).attr('value');
+          $('.reply-form-group' + pk.toString()).toggle();
+          $(this).toggle();
+          $('#cancel-btn' + pk.toString()).toggle();
+        });
+
+        $('.parent-comment').click(function() {
+          var pk = $(this).attr('value')
+          $('.show-parent' + pk.toString()).toggle();
+          $(this).toggle()
+        });
+
+        $('.cancel-btn').click(function() {
+          var pk = $(this).attr('value');
+          $('.reply-form-group' + pk.toString()).toggle();
+          $(this).toggle();
+          $('#reply-btn' + pk.toString()).toggle()
+        });
+
+        $('.reply-reply-btn').click(function() {
+          var pk = $(this).attr('value');
+          $('.reply-reply-form-group' + pk.toString()).toggle();
+          $(this).toggle();
+          $('#reply-cancel-btn' + pk.toString()).toggle();
+          $('.reply-recipient' + pk.toString()).toggle();
+        });
+
+        $('.reply-cancel-btn').click(function() {
+          var pk = $(this).attr('value');
+          $('.reply-reply-form-group' + pk.toString()).toggle();
+          $(this).toggle();
+          $('#reply-reply-btn' + pk.toString()).toggle();
+          $('.reply-recipient' + pk.toString()).toggle();
+        });
+
+        $('.show-replies-button').click(function() {
+          var pk = $(this).attr('value')
+          $(this).parent().parent().next('.replied-comments').fadeToggle();
+          $('#show-replies-button' + pk.toString()).toggle();
+          $('#hide-replies-button' + pk.toString()).toggle();
+        });
+
+        $('.hide-replies-button').click(function() {
+          var pk = $(this).attr('value')
+          $(this).parent().parent().next('.replied-comments').fadeToggle();
+          $('#show-replies-button' + pk.toString()).toggle();
+          $('#hide-replies-button' + pk.toString()).toggle();
+        });
+
+        $(document).on('submit', '.comment-form', function(event){
+            event.preventDefault();
+            var post_id = $(this).attr('value');
+            $.ajax({
+              type: 'POST',
+              url: '{% url "post-detail" 999 %}'.replace(999, post_id),
+              data: $(this).serialize(),
+              dataType: 'json',
+              success: function(response) {
+                $('.main-comment-section').html(response['form']);
+                $('textarea').val('');
+                
+                $('.reply-btn').click(function() {
+                  var pk = $(this).attr('value');
+                  $('.reply-form-group' + pk.toString()).toggle();
+                  $(this).toggle();
+                  $('#cancel-btn' + pk.toString()).toggle()
+                });
+
+                $('.cancel-btn').click(function() {
+                  var pk = $(this).attr('value');
+                  $('.reply-form-group' + pk.toString()).toggle();
+                  $(this).toggle();
+                  $('#reply-btn' + pk.toString()).toggle()
+                });
+                
+                $('.reply-reply-btn').click(function() {
+                  var pk = $(this).attr('value');
+                  $(this).toggle();
+                  $('.reply-reply-form-group' + pk.toString()).toggle();
+                  $('#reply-cancel-btn' + pk.toString()).toggle();
+                  $('.reply-recipient' + pk.toString()).toggle();
+                });
+
+                $('.reply-cancel-btn').click(function() {
+                  var pk = $(this).attr('value');
+                  $('.reply-reply-form-group' + pk.toString()).toggle();
+                  $(this).toggle();
+                  $('#reply-reply-btn' + pk.toString()).toggle();
+                  $('.reply-recipient' + pk.toString()).toggle();
+                });
+                
+                $('.show-replies-button').click(function() {
+                  var pk = $(this).attr('value')
+                  $(this).parent().parent().next('.replied-comments').fadeToggle();
+                  $('#show-replies-button' + pk.toString()).toggle();
+                  $('#hide-replies-button' + pk.toString()).toggle();
+                });
+                
+                $('.hide-replies-button').click(function() {
+                  var pk = $(this).attr('value')
+                  $(this).parent().parent().next('.replied-comments').fadeToggle();
+                  $('#show-replies-button' + pk.toString()).toggle();
+                  $('#hide-replies-button' + pk.toString()).toggle();
+                });
+              },
+              error: function(rs, e) {
+                console.log(rs.responseText);
+              },
+            });
+        });
+
+        $(document).on('click', '#like', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "like_post" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.total-comments-likes' + pk.toString()).html(response['form']);
+              $('.like-button' + pk.toString()).animate({bottom: '10px'}, "fast");
+              $('.like-button' + pk.toString()).animate({bottom: '2px'}, "fast");
+              console.log($('.total-comments-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#dislike', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "dislike_post" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.total-comments-likes' + pk.toString()).html(response['form']);
+              $('.dislike-button' + pk.toString()).animate({top: '10px'}, "fast");
+              $('.dislike-button' + pk.toString()).animate({top: '-2px'}, "fast");
+              console.log($('.total-comments-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#like-comment', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "like_comment" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.comments-likes' + pk.toString()).html(response['form']);
+              $('.comment-like-button' + pk.toString()).animate({bottom: '10px'}, "fast");
+              $('.comment-like-button' + pk.toString()).animate({bottom: '2px'}, "fast");
+              console.log($('.comments-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#like-reply', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "like_reply" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.replies-likes' + pk.toString()).html(response['form']);
+              $('.reply-like-button' + pk.toString()).animate({bottom: '10px'}, "fast");
+              $('.reply-like-button' + pk.toString()).animate({bottom: '2px'}, "fast");
+              console.log($('.replies-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#dislike-comment', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "dislike_comment" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.comments-likes' + pk.toString()).html(response['form']);
+              $('.comment-dislike-button' + pk.toString()).animate({top: '10px'}, "fast");
+              $('.comment-dislike-button' + pk.toString()).animate({top: '-2px'}, "fast");
+              console.log($('.comments-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#dislike-reply', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "dislike_reply" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.replies-likes' + pk.toString()).html(response['form']);
+              $('.reply-dislike-button' + pk.toString()).animate({top: '10px'}, "fast");
+              $('.reply-dislike-button' + pk.toString()).animate({top: '-2px'}, "fast");
+              console.log($('.replies-likes').html(response['form']));
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#save', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "save_post" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.total-comments-likes' + pk.toString()).html(response['form']);
+              $('.ajaxify_saved_count').html(response['count']);
+              $('#alert').delay(4000).fadeOut("slow");
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+
+        $(document).on('click', '#join', function(event){
+          event.preventDefault();
+          var pk = $(this).attr('value');
+          console.log(pk)
+          $.ajax({
+            type: 'POST',
+            url: '{% url "join_community" %}',
+            data: {'id': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function(response){
+              $('.join-form').html(response['form']);
+              $('#alert').delay(4000).fadeOut("slow");
+            },
+            error: function(rs, e){
+              console.log(rs.responseText);
+            }
+          });
+        });
+      });
+
+      $(document).on('click', '#personal-community-list', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        var section = $('span', this).html();
+        var section_img = $('img', this).attr('src');
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+          success: function(response){
+            $('#section-dropdown').html('<img src="' + section_img + '" width="20" height="20">' + ' <span class="section-name"> ' + section + ' </span>');
+            document.title = section;
+            $('.ajaxify').html(response['form']);
+            $('.right-side').html(response['communities']);
+            $('.right-side').prepend(response['about']);
+            $('.community-header').html(response['header']);
+            $('.community-new-button').attr('class', 'community-new-button-selected');
+            var infinite = new Waypoint.Infinite({
+              element: $('.infinite-container')[0],
+              offset: 'bottom-in-view',
+            });
+            window.history.pushState("", "", url);
+          }
+        })
+      });
+
+      $(document).on('click', '.community-detail-new', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        var section_name = $('small', this).html();
+        var section_img = $('img', this).attr('src');
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+          success: function(response){
+            $('#section-dropdown').html('<img src="' + section_img + '" width="20" height="20"> <span class="section-name"> ' + section_name + ' </span>');
+            document.title = section_name;
+            $('.ajaxify').html(response['form']);
+            $('.right-side').html(response['communities']);
+            $('.right-side').prepend(response['about']);
+            $('.community-header').html(response['header']);
+            $('.community-new-button').attr('class', 'community-new-button-selected');
+            var infinite = new Waypoint.Infinite({
+              element: $('.infinite-container')[0],
+              offset: 'bottom-in-view',
+            });
+            window.history.pushState("", "", url);
+          }
+        })
+      });
+
+      $(document).on('click', '#community-new', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+          success: function(response){
+            $('.ajaxify').html(response['form']);
+            $('.community-new-button').attr('class', 'community-new-button-selected');
+            var infinite = new Waypoint.Infinite({
+              element: $('.infinite-container')[0],
+              offset: 'bottom-in-view',
+            });
+            window.history.pushState("", "", url);
+          }
+        })
+      });
+
+      $(document).on('click', '#community-trending', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+          success: function(response){
+            $('.ajaxify').html(response['form']);
+            $('.community-trending-button').attr('class', 'community-trending-button-selected');
+            var infinite = new Waypoint.Infinite({
+              element: $('.infinite-container')[0],
+              offset: 'bottom-in-view',
+            });
+            window.history.pushState("", "", url);
+          }
+        })
+      });
+
+      $(document).on('click', '#community-top', function(event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+          success: function(response){
+            $('.ajaxify').html(response['form']);
+            $('.community-top-button').attr('class', 'community-top-button-selected');
+            var infinite = new Waypoint.Infinite({
+              element: $('.infinite-container')[0],
+              offset: 'bottom-in-view',
+            });
+            window.history.pushState("", "", url);
+          }
+        })
+      });
+
+
+      // Connects each user to a different websocket to receive real-time notifications
+
+      document.addEventListener('DOMContentLoaded', function () {
+          const webSocketBridge = new channels.WebSocketBridge();
+          var chat_badge = document.querySelector('.chat-notification-badge');
+          var badge = document.querySelector('.notification-badge');
+          var badge_value = Number(badge.innerText);
+
+          webSocketBridge.connect('/notifications/');
+          webSocketBridge.listen(function(action, stream) {
+              console.log("RESPONSE:", action);
+
+              if(action.event == "New notification" && action.notification_count !== undefined) {
+                  var user_href = window.location.href;
+                  if(!user_href.includes("chat")) {
+                    var notification_count = action.notification_count
+                    $('#show-notification-badge').show();
+                    badge.innerText = notification_count;
+                  }
+              }
+
+              if(action.event == "New chat" && action.chat_notification_count !== undefined) {
+                  var chat_notification_count = action.chat_notification_count;
+                  var chat_room = action.chat_number;
+                  var notification_badge = document.querySelector('#notification' + chat_room);
+                  var notification_count = $('.chat-notification-count-' + chat_room).attr('value');
+
+                  // Update chat notifications when there are no active chatrooms                  
+                  if(!($('.active-chat-room').length)) {
+                    $(chat_badge).show();
+                    $('.chat-notification-count-' + chat_room).val(parseInt(notification_count) + 1);
+                    chat_badge.innerText = chat_notification_count;
+                    $('#last-message' + chat_room).html(action.content);
+                    $(notification_badge).show();
+                    $('.chat-rooms').prepend($('.chat-room-link-' + chat_room));
+                  }
+
+                  // Prepend new chat room if message is sent to a new chat
+                  if(document.querySelector('.chat-room-link-' + action.chat_number) == null) {
+                    $.ajax({
+                      type: 'GET',
+                      url: '{% url "prepend-new-chat" 999 %}'.replace(999, chat_room),
+                      success: function(response){
+                        $('.new-chat-room').html(response['new_chat_room']);
+                        $('.active-chat-room').attr('class', 'chat-room');
+                        $('.selected').attr('class', 'article-content text-muted');
+                        $('.chat-notification-dot-new').attr('class', 'chat-notification-dot')
+                      }
+                    })
+                  }
+
+                  // Prepends whichever chat room the user just received a message from
+                  var chat_number = action.chat_number;
+                  var chat_room = document.querySelector('.chat-room-link-' + chat_number);
+                  var last_message = document.querySelector('#last-message' + chat_number);
+                  var content = action.content;
+                  var notification_badge = document.querySelector('#notification' + chat_number);
+                  
+                  $(chat_room).prependTo('.chat-rooms');
+                  last_message.innerHTML = content;
+
+                  // If user receives a new message in current chat, don't show notification on that chat
+                  var active_chat_room = $('.active-chat-room').attr('value');
+                  if(active_chat_room !== action.chat_number) {
+                      $(notification_badge).show();
+                      $('.chat-notification-badge').show();
+                      $('.chat-notification-badge').html(action.chat_notification_count);
+                      var notification_count = $('.chat-notification-count-' + chat_number).attr('value');
+                      $('.chat-notification-count-' + chat_number).val(action.chat_notification_count);
+                  } else {
+                    $(notification_badge).hide()
+                  }
+
+                  // Update chat notification as read if messages get sent to already open chat room
+                  if(action.chat_number == active_chat_room) {
+                    $.ajax({
+                      type: 'POST',
+                      url: '{% url "update-chat-notification" %}',
+                      data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    });
+                  }
+              }
+          })
+          document.ws = webSocketBridge; /* for debugging */
+      });
+
+      $(document).ready(function(event){
+        var xhr;
+        var chatSocket;
+        $(document).on('click', '#chat-room-link', function(event){
+            var chat = $(this).attr('value');
+            var tempScrollTop = $('.chat-rooms').scrollTop();
+            var url = $(this).attr('href');
+
+            $(".start-new-chat").show();
+            $(".chat-rooms").css('height', '360px')
+            $(".chat-popup").show();
+            
+            // Manually close previous websocket to prevent duplicate messages
+            if(xhr && xhr.readyState == 4){
+              chatSocket.close()
+            }
+
+            event.preventDefault();
+            xhr = $.ajax({
+                type: $(this).attr('method'),
+                url: $(this).attr('href'),
+                success: function(response){
+                  $("#ajaxify-chat-area").html(response['form']);
+                  // If new chat room is created, prepend it
+                  $(".new-chat-room").html(response['new_chat_room']);
+                  $(".chat-rooms").scrollTop(tempScrollTop);
+
+                  var notification_badge = document.querySelector('#notification' + chat);
+                  notification_badge.style.display = "none";
+
+                  var total_notification_count = $('.chat-notification-badge').html();
+                  var current_chat_notifications = $('.chat-notification-count-' + chat).attr('value');
+
+                  $('.chat-notification-badge').html(total_notification_count - current_chat_notifications);
+                  
+                  if($('.chat-notification-badge').html() == 0){
+                    $('.chat-notification-badge').hide();
+                  }
+
+                  $('.chat-notification-count-' + chat).val("0")
+
+                  // Close chat popup when user clicks on close icon
+                  $("#close-chat").on('click', function(event) {
+                    $(".chat-popup").toggle();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                  });
+
+                  // Minimize chat popup when user clicks on minimize icon
+                  $("#minimize-chat").on('click', function(event) {
+                    $(".chat-popup").fadeToggle();
+                    $(".minimized-chat").fadeToggle();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                  });
+
+                  // Display chat popup when user clicks on minimized chat icon
+                  $(".minimized-chat").on('click', function(event) {
+                    $(".chat-popup").fadeToggle();
+                    $(".minimized-chat").fadeToggle();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                  });
+                  
+                  // Display recipient's username on the chat tab bar
+                  var member_username = document.querySelector(".member-username" + chat).innerHTML
+                  document.querySelector('.user-tab').innerHTML = member_username
+                  
+                  chatSocket = new WebSocket(
+                        'ws://'
+                        + window.location.host
+                        + '/ws/chat/'
+                        + chat
+                        + '/'
+                  );
+
+                  chatSocket.onmessage = function(e) {
+                      var data = JSON.parse(e.data);
+                      var user = document.querySelector('#user').value;
+                      var new_message_box = document.createElement("div");
+                      var new_message_details = document.createElement("div");
+                      var new_message = document.createElement("div");
+                      var user_img = document.createElement("img");
+                      var date = document.createElement("p");
+                      $('.latest-message-date' + chat).text(data.message.timestamp.split(" | ")[1])
+
+                      if (user == data.message.author) {
+                          var date_box = document.createElement("div")
+                          date_box.className = 'date-box';
+                          new_message.className = 'current-user-message';
+                          date.className = 'current-user-message-date';
+                          new_message_box.className = 'current-user-message-box';
+                          date.appendChild(document.createTextNode(data.message.timestamp + '\n'))
+                          date_box.appendChild(date);
+                          new_message.appendChild(document.createTextNode(data.message.content + '\n'));
+                          new_message_box.appendChild(new_message);
+                          new_message_box.appendChild(date_box);
+                          document.querySelector('.chat-box').appendChild(new_message_box);
+                      } else {
+                          new_message.className = 'other-user-message';
+                          new_message_details.className = 'new-message-details'
+                          user_img.src = data.message.author_img;
+                          user_img.className = 'chat-user-img';
+                          new_message_box.className = 'other-user-message-box';
+                          date.className = 'other-user-message-date';
+                          date.appendChild(document.createTextNode(data.message.timestamp + '\n'))
+                          new_message.appendChild(document.createTextNode(data.message.content + '\n'));
+                          new_message_box.appendChild(user_img)
+                          new_message_details.appendChild(new_message)
+                          new_message_details.appendChild(date)
+                          new_message_box.appendChild(new_message_details)
+                          document.querySelector('.chat-box').appendChild(new_message_box)
+                      }
+
+                      // Make scroll stay at bottom whenever new messages are added
+                      var chatBox = document.querySelector('.chat-box');
+                      chatBox.scrollTop = chatBox.scrollHeight;
+                      
+                  };
+
+                  chatSocket.onclose = function(e) {
+                      console.log('Chat socket closed');
+                  };
+
+                  document.querySelector('#chat-message-input').focus();
+                  document.querySelector('#chat-message-input').onkeyup = function(e) {
+                      if (e.keyCode === 13) {  // enter, return
+                          document.querySelector('.chat-message-submit').click();
+                      }
+                  };
+
+                  document.querySelector('.chat-message-submit').onclick = function(e) {
+                      var messageInputDom = document.querySelector('#chat-message-input');
+                      var message = messageInputDom.value;
+                      var number = chat;
+                      var pk = document.querySelector('.chat-message-submit').value;
+                      var last_message = document.querySelector('#last-message' + pk);
+                      var other_user = document.querySelector('#other-user').value;
+                      var chat_room = document.querySelector('.chat-room-link-' + pk);
+
+                      last_message.innerHTML = message;
+                      // Prepends whichever chat room the user just sent a message to
+                      $(chat_room).prependTo('.chat-rooms')
+
+                      chatSocket.send(JSON.stringify({
+                          'number': number,
+                          'message': message,
+                          'other_user': other_user,
+                          'command': "new_message",
+                      }));
+                      messageInputDom.value = '';
+                  };
+                  document.ws = webSocketBridge; /* for debugging */
+                  
+            
+                },
+                error: function(rs, e){
+                  console.log(rs.responseText);
+                }
+            })
+        });
+        
+
+        
+        var infinite = new Waypoint.Infinite({
+          element: $('.infinite-container')[0],
+          offset: 'bottom-in-view',
+        });
+
+        $(document).on('click', '.new-button', function(event){
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{% url "forum-home" %}',
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", '/');
+              $('.new-button').attr('class', 'new-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '.top-button', function(event){
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{% url "home-top-posts" %}',
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", '/top/');
+              $('.top-button').attr('class', 'top-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '.trending-button', function(event){
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: '{% url "home-trending-posts" %}',
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $('.trending-button').attr('class', 'trending-button-selected');
+              window.history.pushState("", "", '/trending/');
+              $('.infinite-container').attr('class', 'infinite-trending')
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-trending')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '#create-community', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href')
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/people.svg" width="20" height="20"> <span class="section-name"> Create Community </span> ');
+              document.title = 'Create new community';
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['communities']);
+              $(".community-header").html("")
+              window.history.pushState("", "", url);
+            }
+          })
+        });
+
+        $(document).on('submit', '.create-new-community', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: $(this).attr('method'),
+            url: '{% url "community-create" %}',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response){
+              $('.ajaxify').html(response['form']);
+              $('.right-side').prepend(response['about']);
+              $('.community-header').html(response['header']);
+              $('.community-new-button').attr('class', 'community-new-button-selected');
+              var section = $('.section').val();
+              $('#section-dropdown').html(section);
+              var community = $('.about-community').attr('value');
+              window.history.pushState("", "", "/community/" + community + "/");
+            }
+          })
+        });
+
+        $(document).on('click', '.home-create-post', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "home-post" %}',
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/writing.svg" height="20" width="20"> <span class="section-name"> Create Post </span>');
+              document.title = 'Create Post';
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['communities']);
+              $(".community-header").html("");
+              window.history.pushState("", "", '/post/new/');
+            }
+          })
+        });
+
+        $(document).on('click', '.community-create-post', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/writing.svg" height="20" width="20"> <span class="section-name"> Create Post </span>');
+              document.title = 'Create Post';
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['communities']);
+              $(".community-header").html("");
+              window.history.pushState("", "", url);
+            }
+          })
+        });
+
+        $(document).on('click', '#update-post', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/edit.svg" height="20" width="20"> <span class="section-name"> Update Post </span>');
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", url);
+            }
+          })
+        });
+
+        $(document).on('submit', '#submit-updated-post', function(event) {
+          event.preventDefault();
+          var post_id = $(this).attr('value');
+          $.ajax({
+            type: 'POST',
+            url: '{% url "post-update" 999 %}'.replace(999, post_id),
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $('#alert').delay(4000).fadeOut("slow");
+              window.history.pushState("", "", "/post/" + post_id)
+            }
+          })
+        });
+
+        $(document).on('click', '#delete-post', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", url);
+            }
+          })
+        });
+
+        $(document).on('submit', '.confirm-delete', function(event) {
+          event.preventDefault();
+          var post_id = $(this).attr('value');
+          $.ajax({
+            type: 'POST',
+            url: '{% url "post-delete" 999 %}'.replace(999, post_id),
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/house.svg" width="20" height="20"> <span class="section-name"> Home </span>');
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['communities']);
+              $('.new-button').attr('class', 'new-button-selected');
+              $('#alert').delay(4000).fadeOut("slow");
+              window.history.pushState("", "", "/")
+            }
+          })
+        });
+
+        $(document).on('click', '.notification-icon', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href')
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/bell (1).svg" width="20" height="20"> <span class="section-name"> Notifications </span>');
+              document.title = 'Notifications';
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['communities']);
+              $(".community-header").html("");
+              $(".notification-badge").hide();
+              window.history.pushState("", "", url);
+              $('.parent-comment').click(function() {
+                var pk = $(this).attr('value')
+                $('.show-parent' + pk.toString()).toggle();
+                $(this).toggle()
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.notification-link', function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href');
+          // var section = $('.section').val();
+          // var section_img = $('.section_img').val();
+          var section = $('input', this).val();
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#section-dropdown').html(section);
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", url);
+              $('.reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#cancel-btn' + pk.toString()).toggle();
+              });
+
+              $('.parent-comment').click(function() {
+                var pk = $(this).attr('value')
+                $('.show-parent' + pk.toString()).toggle();
+                $(this).toggle()
+              });
+
+              $('.cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-btn' + pk.toString()).toggle()
+              });
+
+              $('.reply-reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-cancel-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.reply-cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-reply-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.show-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+
+              $('.hide-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+            }
+          })
+        });
+
+        // $(document).on('click', '.view-all-comments', function(event) {
+        //   event.preventDefault();
+        //   var url = $(this).attr('href');
+        //   $.ajax({
+        //     type: 'GET',
+        //     url: url,
+        //     success: function(response){
+        //       $(".ajaxify").html(response['form']);
+        //       window.history.pushState("", "", url)
+        //     }
+        //   })
+        // })
+
+        $('.view-all-comments').click(function(event) {
+          event.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              window.history.pushState("", "", url);
+              $('.reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#cancel-btn' + pk.toString()).toggle();
+              });
+
+              $('.parent-comment').click(function() {
+                var pk = $(this).attr('value')
+                $('.show-parent' + pk.toString()).toggle();
+                $(this).toggle()
+              });
+
+              $('.cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-btn' + pk.toString()).toggle()
+              });
+
+              $('.reply-reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-cancel-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.reply-cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-reply-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.show-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+
+              $('.hide-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+            }
+          })
+        });
+
+        // Ajaxify post form submission
+        $(document).on('submit', '#new-post', function(event) {
+          event.preventDefault();
+          var formData = new FormData(this);
+          $.ajax({
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            url: '{% url "home-post" %}',
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/house.svg" width="20" height="20"> <span class="section-name"> Home </span>');
+              $(".ajaxify").html(response['form']);
+              $('.new-button').attr('class', 'new-button-selected');
+              window.history.pushState("", "", '/');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        // Ajaxify profile update form submission
+        $(document).on('submit', '.update-profile-form', function(event) {
+          event.preventDefault();
+          var formData = new FormData(this);
+          $.ajax({
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            url: '{% url "profile" %}',
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $('#alert').delay(4000).fadeOut("slow");
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.view-communities-button', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "communities" %}',
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/community.svg" height="20" width="20"> <span class="section-name"> Communities </span>');
+              document.title = 'Communities';
+              $('.ajaxify').html(response['form']);
+              $('.community-header').html("");
+              $('.right-side').html(response['communities']);
+              window.history.pushState("", "", "/communities/");
+            }
+          })
+        });
+
+        $(document).on('click', '#user-profile', function(event) {
+          event.preventDefault();
+          var username = $(this).attr('value');
+          var user_pic = $('#user-pic-' + username).attr('src');
+          $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $('#section-dropdown').html('<img src="' + user_pic + '" width="20" height="20"> <span class="section-name"> ' + username + ' </span>');
+              document.title = username + "'s Profile";
+              $('.ajaxify').html(response['form']);
+              $('.right-side').html(response['user_info']);
+              $('.community-header').html("");
+              $('.user-new-button').attr('class', 'user-new-button-selected');
+              window.history.pushState("", "", "/user/" + username);
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '#personal-profile', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: $(this).attr('href'),
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/user.svg" width="20" height="20"> <span class="section-name"> Profile </span>');
+              document.title = 'Profile';
+              $('.ajaxify').html(response['form']);
+              $('.profile-new-button').attr('class', 'profile-new-button-selected');
+              $('.right-side').html(response['user_info']);
+              $('.community-header').html("");
+              window.history.pushState("", "", "/profile/");
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.profile-new-button', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "profile" %}',
+            success: function(response){
+              $('.ajaxify').html(response['form']);
+              $('.profile-new-button').attr('class', 'profile-new-button-selected');
+              window.history.pushState("", "", "/profile/");
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.profile-trending-button', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "profile-trending-posts" %}',
+            success: function(response){
+              $('.ajaxify').html(response['form']);
+              $('.profile-trending-button').attr('class', 'profile-trending-button-selected');
+              window.history.pushState("", "", "/profile/trending_posts/");
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.profile-top-button', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "profile-top-posts" %}',
+            success: function(response){
+              $('.ajaxify').html(response['form']);
+              $('.profile-top-button').attr('class', 'profile-top-button-selected');
+              window.history.pushState("", "", "/profile/top_posts/");
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '#saved-posts', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: $(this).attr('href'),
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/floppy-disk.svg" width="20" height="20"> <span class="section-name"> Saved </span> ');
+              document.title = 'Saved Posts';
+              $('.ajaxify').html(response['form']);
+              $('.right-side').html(response['communities']);
+              $('.community-header').html("")
+              window.history.pushState("", "", "/saved/");
+            }
+          })
+        })
+
+        $(document).on('click', '#home', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/house.svg" width="20" height="20"> <span class="section-name"> Home </span>');
+              document.title = 'SpaceHut';
+              $('.ajaxify').html(response['form'])
+              $('.right-side').html(response['communities'])
+              $('.community-header').html("")
+              window.history.pushState("", "", "/")
+              $('.new-button').attr('class', 'new-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.navbar-brand', function(event) {
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $('#section-dropdown').html('<img src="/media/house.svg" width="20" height="20"> <span class="section-name"> Home </span>');
+              document.title = 'SpaceHut';
+              $('.ajaxify').html(response['form'])
+              $('.right-side').html(response['communities'])
+              $('.community-header').html("")
+              window.history.pushState("", "", "/")
+              $('.new-button').attr('class', 'new-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          })
+        })
+
+        $(document).on('click', '#post-details', function(event) {
+          var main_url = $(this).attr('href');
+          var header = $(this).html();
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: main_url,
+            success: function(response){
+              document.title = header;
+              $('.ajaxify').html(response['form']);
+              $('.right-side').html(response['communities']);
+              $('.community-header').html("");
+              window.history.pushState("", "", main_url);
+              $('.reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#cancel-btn' + pk.toString()).toggle();
+              });
+
+              $('.parent-comment').click(function() {
+                var pk = $(this).attr('value')
+                $('.show-parent' + pk.toString()).toggle();
+                $(this).toggle()
+              });
+
+              $('.cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-btn' + pk.toString()).toggle()
+              });
+
+              $('.reply-reply-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-cancel-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.reply-cancel-btn').click(function() {
+                var pk = $(this).attr('value');
+                $('.reply-reply-form-group' + pk.toString()).toggle();
+                $(this).toggle();
+                $('#reply-reply-btn' + pk.toString()).toggle();
+                $('.reply-recipient' + pk.toString()).toggle();
+              });
+
+              $('.show-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+
+              $('.hide-replies-button').click(function() {
+                var pk = $(this).attr('value')
+                $(this).parent().parent().next('.replied-comments').fadeToggle();
+                $('#show-replies-button' + pk.toString()).toggle();
+                $('#hide-replies-button' + pk.toString()).toggle();
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.user-new-button', function(event){
+          event.preventDefault();
+          var username = $(this).attr('value');
+          $.ajax({
+            type: 'POST',
+            url: '{% url "user-posts" 999 %}'.replace(999, username),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['user_info']);
+              window.history.pushState("", "", '/user/' + username + '/');
+              $('.user-new-button').attr('class', 'user-new-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '.user-top-button', function(event){
+          event.preventDefault();
+          var username = $(this).attr('value');
+          $.ajax({
+            type: 'POST',
+            url: '{% url "user-posts-top" 999 %}'.replace(999, username),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['user_info']);
+              window.history.pushState("", "", '/user/' + username + '/top/');
+              $('.user-top-button').attr('class', 'user-top-button-selected');
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-container')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '.user-trending-button', function(event){
+          event.preventDefault();
+          var username = $(this).attr('value');
+          $.ajax({
+            type: 'POST',
+            url: '{% url "user-posts-trending" 999 %}'.replace(999, username),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              $(".ajaxify").html(response['form']);
+              $(".right-side").html(response['user_info']);
+              $('.user-trending-button').attr('class', 'user-trending-button-selected');
+              window.history.pushState("", "", '/user/' + username + '/trending/');
+              $('.infinite-container').attr('class', 'infinite-trending')
+              var infinite = new Waypoint.Infinite({
+                element: $('.infinite-trending')[0],
+                offset: 'bottom-in-view',
+              });
+            }
+          });
+        });
+
+        $(document).on('click', '.start-new-chat', function(event){
+          event.preventDefault();
+          $.ajax({
+            type: 'GET',
+            url: '{% url "start-new-chat" %}',
+            success: function(response){
+              $('#ajaxify-chat-area').html(response['form']);
+              $('.start-new-chat').hide();
+              $('.chat-rooms').css('height', '400px');
+              
+              // Close chat popup when user clicks on close icon
+              $("#close-chat").on('click', function(event) {
+                $(".chat-popup").toggle();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+              });
+
+              // Minimize chat popup when user clicks on minimize icon
+              $("#minimize-chat").on('click', function(event) {
+                $(".chat-popup").fadeToggle();
+                $(".minimized-chat").fadeToggle();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+              });
+
+              // Display chat popup when user clicks on minimized chat icon
+              $(".minimized-chat").on('click', function(event) {
+                $(".chat-popup").fadeToggle();
+                $(".minimized-chat").fadeToggle();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+              });
+            }
+          })
+        });
+
+        $(document).on('click', '.follow-button', function(event){
+          event.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            success: function(response){
+              var status = response['status'];
+              if(status) {
+                $('.follow-button').html("Unfollow")
+              } else {
+                $('.follow-button').html("Follow")
+              };
+            }
+          })
+        });
+
+        $(document).on('click', '.user', function(event) {
+          var username = $(this).attr('value');
+          var request_user = parseInt($('.request_user').attr('value'));
+          var following_user = parseInt($('.user_id_' + username).attr('value'));
+          var user = document.createElement('p');
+          user.className = 'selected-username';
+          user.innerHTML = username;
+          $('.selected-user').html("");
+          $('.selected-user').append(user);
+          $('.selected-user').show();
+
+          var chat_id = request_user + following_user;
+          $('.start-chat').attr('value', chat_id);
+
+          var url = "{% url 'room' 999 %}".replace(999, chat_id)
+          $('.start-chat').attr('href', url)
+        });
+
+        // Processes popstate events on the window
+        window.addEventListener("popstate", function(e) {
+          window.location.reload();
+        });
+
+        $(document).on('click', '#chat-hamburger', function(event) {
+          $(this).css('display', 'none');
+          $('.chat-area').css('width', '0');
+          $('.chat-rooms').show();
+          $('.start-new-chat').show();
+
+          $('.start-new-chat').click(function(event) {
+            $('.chat-rooms').hide();
+            $('.chat-area').css('width', '100vw');
+            $('.chat-area').show();
+
+            if ($(window).width() >= 501) {
+              $('.chat-area').css('width', '65%');
+              $('.chat-rooms').css('width', '35%');
+              $('.chat-rooms').show();
+            };
+          });
+
+          $(document).on('click', '#chat-room-link', function(event) {
+            $('.start-new-chat').hide();
+            $('.chat-area').css('width', '100vw')
+            $('.chat-area').show();
+            $('.chat-rooms').hide();
+
+            if ($(window).width() >= 501) {
+              $('.chat-area').css('width', '65%');
+              $('.chat-rooms').css('width', '35%');
+              $('.chat-rooms').show();
+              $('.start-new-chat').show();
+            };
+
+            $('#chat-room-link').click(function(event) {
+              $('.chat-area').css('width', '100vw');
+              $('.chat-rooms').hide();
+            });
+          });
+        });
+
+        $(document).on('click', '#chat-hamburger2', function(event) {
+          $('.chat-area').css('display', 'none');
+          $('.chat-rooms').css('width', '100vw');
+          $('.chat-rooms').css('height', '75vh');
+          $('.chat-rooms').show();
+          $('.start-new-chat').show();
+
+          $(document).on('click', '#chat-room-link', function(event) {
+            $('.chat-rooms').hide();
+            $('.chat-area').css('width', '100vw');
+            $('.chat-area').show();
+
+            if ($(window).width() >= 501) {
+              $('.chat-area').css('width', '65%');
+              $('.chat-rooms').css('width', '35%');
+              $('.chat-rooms').show();
+              $('.start-new-chat').show();
+            };
+
+            $('#chat-room-link').click(function(event) {
+              $('.chat-rooms').hide();
+              $('.chat-area').css('width', '100vw');
+              $('.chat-area').show();
+            });
+          });
+        });
+        
+        // Resize chat box to original size if window width <= 500px
+        $(window).on('resize', function(){
+          var win = $(this); //this = window
+          if (win.width() >= 501) {
+            $('.chat-area').css('width', '65%')
+            $('.chat-rooms').css('width', '35%');
+            $('.start-new-chat').css('width', '35vw');
+            $('.start-new-chat').show();
+            $('.chat-area').show();
+            $('.chat-rooms').show();
+          };
+
+          if (win.width() <= 500) {
+            $('.chat-area').css('width', '100vw');
+            $('.chat-rooms').css('width', '100vw');
+            $('.chat-rooms').hide();
+            $('.start-new-chat').css('width', '100vw');
+            $('.start-new-chat').hide();
+            $('#chat-hamburger').show();
+          };
+
+          if(win.width() >= 695) {
+            $('.start-new-chat').css('width', '227.5px');
+          };
+        });
+
+        // $('.dropdown-item').on('click', function(event) {
+        //   if ($('a', this).attr('id') == 'personal-community-list') {
+        //     var section = $('a', this).html();
+        //     $('#section-dropdown').html(section + ' ');
+        //   } else {
+        //     // var section = $(this).html();
+        //     var section = $('span', this).html();
+        //     var section_img = $('img', this).attr('src');
+        //     $('img', '#section-dropdown').attr('src', section_img);
+        //     $('span', '#section-dropdown').innerHTML(section);
+        //   }
+        // });
+
+        // $('#community-detail-new').click(function(event) {
+        //   console.log('hey')
+        //   var section = $(this).html();
+        //   $('#section-dropdown').html(section + ' ');
+        // });
+      });
+    </script>
+    <script>
+      $("#chat-btn").click(function(event) {
+        $(".chat-popup").toggle();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      });
+    </script>
+</body>
+</html>
