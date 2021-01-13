@@ -6,6 +6,8 @@ from django.core.asgi import get_asgi_application
 from notifier.consumers import NoseyConsumer
 from chat.consumers import ChatConsumer
 
+ASGI_APPLICATION = "spacehut.routing.application"
+
 application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
