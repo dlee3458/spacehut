@@ -462,7 +462,7 @@ def create_community_post(request, name):
 def create_community(request):
     if request.is_ajax():
         if request.method == 'POST':
-            community_form = CommunityForm(request.POST)
+            community_form = CommunityForm(request.POST, request.FILES or None)
         
             if community_form.is_valid():
                 new_community = community_form.save(commit=False)
