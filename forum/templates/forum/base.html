@@ -843,11 +843,15 @@
 
         $(document).on('submit', '.create-new-community', function(event) {
           event.preventDefault();
+          var formData = new FormData(this);
           $.ajax({
-            type: $(this).attr('method'),
+            type: 'POST',
             url: '{% url "community-create" %}',
-            data: $(this).serialize(),
+            data: formData,
             dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
             success: function(response){
               $('.ajaxify').html(response['form']);
               $('.right-side').prepend(response['about']);
